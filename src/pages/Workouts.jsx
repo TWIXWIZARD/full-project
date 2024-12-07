@@ -6,8 +6,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DateCalendar } from "@mui/x-date-pickers";
 import { getWorkouts } from "../api";
 import { CircularProgress } from "@mui/material";
-import { useDispatch } from "react-redux";
-
+import { useNavigate } from "react-router-dom";
 const Container = styled.div`
   flex: 1;
   height: 100%;
@@ -72,25 +71,93 @@ const SecTitle = styled.div`
   font-weight: 500;
 `;
 
+const workout = {
+  category: "Strength",
+  workoutName: "Bench Press",
+  sets: 4,
+  reps: 12,
+  weight: 80,
+  duration: 45,
+  imageUrl: "https://via.placeholder.com/60",
+  videoUrl: "https://www.example.com",
+};
+
+
+// const Workouts = () => {
+//   const dispatch = useDispatch();
+//   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
+//   const [loading, setLoading] = useState(false);
+//   const [date, setDate] = useState("");
+
+//   const getTodaysWorkout = async () => {
+//     setLoading(true);
+//     const token = localStorage.getItem("fittrack-app-token");
+//     await getWorkouts(token, date ? `?date=${date}` : "").then((res) => {
+//       setTodaysWorkouts(res?.data?.todaysWorkouts);
+//       console.log(res.data);
+//       setLoading(false);
+//     });
+//   };
+
+//   useEffect(() => {
+//     getTodaysWorkout();
+//   }, [date]);
+//   return (
+//     <Container>
+//       <Wrapper>
+//         <Left>
+//           <Title>Select Date</Title>
+//           <LocalizationProvider dateAdapter={AdapterDayjs}>
+//             <DateCalendar
+//               onChange={(e) => setDate(`${e.$M + 1}/${e.$D}/${e.$y}`)}
+//             />
+//           </LocalizationProvider>
+//         </Left>
+//         <Right>
+//           <Section>
+//             <SecTitle>Todays Workout</SecTitle>
+//             {loading ? (
+//               <CircularProgress />
+//             ) : (
+//               <CardWrapper>
+//                 {todaysWorkouts.map((workout) => (
+//                   <WorkoutCard workout={workout} />
+//                 ))}
+//               </CardWrapper>
+//             )}
+//           </Section>
+//         </Right>
+//       </Wrapper>
+//     </Container>
+//   );
+// };
+
+// export default Workouts;
 const Workouts = () => {
-  const dispatch = useDispatch();
   const [todaysWorkouts, setTodaysWorkouts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState("");
+  const navigate = useNavigate();
 
   const getTodaysWorkout = async () => {
     setLoading(true);
     const token = localStorage.getItem("fittrack-app-token");
-    await getWorkouts(token, date ? `?date=${date}` : "").then((res) => {
-      setTodaysWorkouts(res?.data?.todaysWorkouts);
-      console.log(res.data);
-      setLoading(false);
-    });
+    const res = await getWorkouts(token, date ? `?date=${date}` : "");
+    console.log("workout: ", res)
+    setTodaysWorkouts(res?.data?.todaysWorkouts || []);
+    setLoading(false);
   };
 
   useEffect(() => {
     getTodaysWorkout();
   }, [date]);
+
+  const handleCardClick = (workoutId) => {
+    navigate(`/workout/${workoutId}`);
+  };
+  
+  
+
   return (
     <Container>
       <Wrapper>
@@ -110,7 +177,11 @@ const Workouts = () => {
             ) : (
               <CardWrapper>
                 {todaysWorkouts.map((workout) => (
-                  <WorkoutCard workout={workout} />
+                  <WorkoutCard
+                    key={workout.id}
+                    workout={workout}
+                    onClick={() => handleCardClick(workout._id)}
+                  />
                 ))}
               </CardWrapper>
             )}

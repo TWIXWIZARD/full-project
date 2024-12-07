@@ -135,7 +135,7 @@ const Dashboard = () => {
         <Section>
           <Title>Todays Workouts</Title>
           <CardWrapper>
-            {todaysWorkouts.map((workout) => (
+            {todaysWorkouts.map((workout,) => (
               <WorkoutCard workout={workout} />
             ))}
           </CardWrapper>
